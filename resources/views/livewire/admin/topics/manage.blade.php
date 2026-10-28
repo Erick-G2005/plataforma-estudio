@@ -32,41 +32,83 @@
             </a>
         </div>
 
-        <div class="bg-white rounded-lg shadow divide-y">
-            @forelse ($topics as $topic)
-                <div wire:key="topic-{{ $topic->id }}" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4">
-                    <div>
-                        <p class="font-medium">{{ $topic->title }}</p>
-                        <p class="text-sm text-gray-500">
-                            {{ $topic->materials_count }} materiales · orden: {{ $topic->order }}
-                            ·
-                            @if ($topic->quiz)
-                                quiz con {{ $topic->quiz->questions_count }} {{ $topic->quiz->questions_count === 1 ? 'pregunta' : 'preguntas' }}
-                            @else
-                                <span class="text-amber-600">sin quiz</span>
-                            @endif
-                        </p>
-                    </div>
+        @if ($topics->isEmpty())
+            <div class="p-6 bg-white rounded-lg shadow text-sm text-gray-500">
+                No hay temas todavía para esta materia. Crea el primero con «+ Nuevo tema».
+            </div>
+        @else
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <ul class="divide-y"
+                    x-data="{
+                        sortable: null,
+                        init() {
+                            const boot = () => {
+                                if (! window.Sortable) { return setTimeout(boot, 100); }
+                                this.sortable = window.Sortable.create(this.$el, {
+                                    handle: '[data-handle]',
+                                    animation: 150,
+                                    onEnd: () => {
+                                        const ids = Array.from(this.$el.querySelectorAll('[data-id]')).map((el) => parseInt(el.dataset.id));
+                                        $wire.reorder(ids);
+                                    },
+                                });
+                            };
+                            boot();
+                        },
+                        destroy() { if (this.sortable) { this.sortable.destroy(); } },
+                    }">
+                    @foreach ($topics as $topic)
+                        <li wire:key="topic-{{ $topic->id }}" data-id="{{ $topic->id }}"
+                            class="flex flex-col gap-3 bg-white p-4 sm:flex-row sm:items-center">
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a href="{{ route('admin.topics.materials', $topic) }}" wire:navigate
-                           class="text-sm text-indigo-600 hover:underline">Gestionar materiales</a>
+                            <div class="flex min-w-0 flex-1 items-center gap-3">
+                                <span data-handle title="Arrastra para reordenar"
+                                      class="cursor-grab select-none text-lg leading-none text-gray-300 hover:text-gray-500">⋮⋮</span>
 
-                        <a href="{{ route('admin.topics.quiz', $topic) }}" wire:navigate
-                           class="text-sm text-indigo-600 hover:underline">{{ $topic->quiz ? 'Gestionar quiz' : 'Crear quiz' }}</a>
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-600">
+                                    {{ $loop->iteration }}
+                                </span>
 
-                        <button wire:click="openEdit({{ $topic->id }})"
-                                class="text-sm text-indigo-600 hover:underline">Editar</button>
+                                <div class="min-w-0">
+                                    <p class="truncate font-medium">{{ $topic->title }}</p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ $topic->materials_count }} {{ $topic->materials_count === 1 ? 'material' : 'materiales' }}
+                                        ·
+                                        @if ($topic->quiz)
+                                            quiz con {{ $topic->quiz->questions_count }} {{ $topic->quiz->questions_count === 1 ? 'pregunta' : 'preguntas' }}
+                                        @else
+                                            <span class="text-amber-600">sin quiz</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
 
-                        <button wire:click="delete({{ $topic->id }})"
-                                wire:confirm="¿Seguro que quieres eliminar este tema? Se borrarán también sus materiales y quiz."
-                                class="text-sm text-red-600 hover:underline">Eliminar</button>
-                    </div>
-                </div>
-            @empty
-                <p class="p-4 text-sm text-gray-500">No hay temas todavía para esta materia.</p>
-            @endforelse
-        </div>
+                            <div class="flex flex-wrap items-center gap-3 text-sm">
+                                <button type="button" wire:click="move({{ $topic->id }}, 'up')" @disabled($loop->first)
+                                        title="Subir" class="text-gray-400 hover:text-gray-700 disabled:opacity-30">↑</button>
+                                <button type="button" wire:click="move({{ $topic->id }}, 'down')" @disabled($loop->last)
+                                        title="Bajar" class="text-gray-400 hover:text-gray-700 disabled:opacity-30">↓</button>
+
+                                <a href="{{ route('admin.topics.materials', $topic) }}" wire:navigate
+                                   class="text-indigo-600 hover:underline">Gestionar materiales</a>
+
+                                <a href="{{ route('admin.topics.quiz', $topic) }}" wire:navigate
+                                   class="text-indigo-600 hover:underline">{{ $topic->quiz ? 'Gestionar quiz' : 'Crear quiz' }}</a>
+
+                                <button type="button" wire:click="openEdit({{ $topic->id }})"
+                                        class="text-indigo-600 hover:underline">Editar</button>
+
+                                <button type="button" wire:click="delete({{ $topic->id }})"
+                                        wire:confirm="¿Seguro que quieres eliminar este tema? Se borrarán también sus materiales y quiz."
+                                        class="text-red-600 hover:underline">Eliminar</button>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <p class="text-xs text-gray-400">Arrastra el icono ⋮⋮ para cambiar el orden, o usa las flechas. Los estudiantes recorren los temas en este mismo orden.</p>
+        @endif
     </div>
 
     {{-- Modal de crear/editar --}}
@@ -87,12 +129,6 @@
                         <textarea wire:model="description" rows="3" class="w-full rounded-lg border-gray-300 text-sm"></textarea>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Orden</label>
-                        <input type="number" wire:model="order" class="w-full rounded-lg border-gray-300 text-sm">
-                        @error('order') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                    </div>
-
                     <div class="flex justify-end gap-2 pt-2">
                         <button type="button" wire:click="$set('showModal', false)"
                                 class="text-sm text-gray-600 px-4 py-2">Cancelar</button>
@@ -106,3 +142,7 @@
         </div>
     @endif
 </div>
+
+@assets
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+@endassets

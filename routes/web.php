@@ -23,14 +23,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->middleware('guest')->name('home');
 
 Route::get('dashboard', StudentDashboard::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/my-learning', MyLearning::class)->name('my-learning');
     Route::get('/subjects/{subject}', SubjectsShow::class)->name('subjects.show');
     Route::get('/topics/{topic}', TopicsShow::class)->name('topics.show');
@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/quizzes/{quiz}/attempts/{attempt}', QuizAttemptPage::class)->name('quizzes.attempt');
 });
 
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', AdminDashboard::class)->name('dashboard');
     Route::get('/subjects', AdminSubjectsManage::class)->name('subjects.index');
     Route::get('/subjects/{subject}/topics', AdminTopicsManage::class)->name('subjects.topics');

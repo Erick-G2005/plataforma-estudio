@@ -53,19 +53,6 @@ class Show extends Component
             : "{$this->student->name} ya no es administrador.");
     }
 
-    public function verifyEmail(): void
-    {
-        $this->clearNotice();
-
-        if ($this->student->email_verified_at) {
-            return;
-        }
-
-        $this->student->forceFill(['email_verified_at' => now()])->save();
-
-        $this->setNotice('Correo marcado como verificado.');
-    }
-
     public function generatePassword(): void
     {
         $this->newPassword = Str::password(10, symbols: false);

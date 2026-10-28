@@ -25,9 +25,6 @@
                 <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $student->isAdmin() ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600' }}">
                     {{ $student->isAdmin() ? 'Administrador' : 'Estudiante' }}
                 </span>
-                <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $student->email_verified_at ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
-                    {{ $student->email_verified_at ? '✓ Correo verificado' : 'Correo sin verificar' }}
-                </span>
             </div>
         </div>
 
@@ -39,7 +36,7 @@
         <div class="p-6 bg-white rounded-lg shadow space-y-5">
             <h2 class="font-semibold">Cuenta</h2>
 
-            <div class="grid md:grid-cols-3 gap-6">
+            <div class="grid md:grid-cols-2 gap-6">
                 <div class="space-y-2">
                     <p class="text-sm font-medium">Rol</p>
                     <p class="text-sm text-gray-600">{{ $student->isAdmin() ? 'Administrador' : 'Estudiante' }}</p>
@@ -54,20 +51,6 @@
                         <button type="button" wire:click="setRole('admin')"
                                 wire:confirm="¿Dar rol de administrador a {{ $student->name }}? Podrá gestionar todo el contenido y los estudiantes."
                                 class="text-sm font-medium text-indigo-600 hover:underline">Hacer administrador</button>
-                    @endif
-                </div>
-
-                <div class="space-y-2">
-                    <p class="text-sm font-medium">Correo electrónico</p>
-
-                    @if ($student->email_verified_at)
-                        <p class="text-sm text-green-600">
-                            ✓ Verificado el {{ $student->email_verified_at->copy()->timezone('America/Bogota')->format('d/m/Y') }}
-                        </p>
-                    @else
-                        <p class="text-sm text-amber-600">Todavía sin verificar</p>
-                        <button type="button" wire:click="verifyEmail"
-                                class="text-sm font-medium text-indigo-600 hover:underline">Marcar como verificado</button>
                     @endif
                 </div>
 

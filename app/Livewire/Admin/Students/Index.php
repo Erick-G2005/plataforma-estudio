@@ -46,7 +46,6 @@ class Index extends Component
                 'all' => User::count(),
                 'students' => User::where('role', 'student')->count(),
                 'admins' => User::where('role', 'admin')->count(),
-                'unverified' => User::whereNull('email_verified_at')->count(),
             ],
         ]);
     }

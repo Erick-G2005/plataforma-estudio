@@ -5,7 +5,7 @@
             <h1 class="text-2xl font-bold mt-1">Estudiantes</h1>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="grid grid-cols-3 gap-4">
             <div class="p-4 bg-white rounded-lg shadow">
                 <p class="text-2xl font-bold">{{ $totals['all'] }}</p>
                 <p class="text-xs text-gray-500">Usuarios en total</p>
@@ -17,10 +17,6 @@
             <div class="p-4 bg-white rounded-lg shadow">
                 <p class="text-2xl font-bold">{{ $totals['admins'] }}</p>
                 <p class="text-xs text-gray-500">Administradores</p>
-            </div>
-            <div class="p-4 bg-white rounded-lg shadow">
-                <p class="text-2xl font-bold {{ $totals['unverified'] > 0 ? 'text-amber-600' : '' }}">{{ $totals['unverified'] }}</p>
-                <p class="text-xs text-gray-500">Correo sin verificar</p>
             </div>
         </div>
 
@@ -43,7 +39,6 @@
                         <th class="px-4 py-3 font-semibold">Usuario</th>
                         <th class="px-4 py-3 font-semibold">Rol</th>
                         <th class="px-4 py-3 font-semibold">Materias</th>
-                        <th class="px-4 py-3 font-semibold">Correo</th>
                         <th class="px-4 py-3 font-semibold">Registro</th>
                         <th class="px-4 py-3"></th>
                     </tr>
@@ -66,14 +61,6 @@
 
                             <td class="px-4 py-3">{{ $user->enrolled_subjects_count }}</td>
 
-                            <td class="px-4 py-3">
-                                @if ($user->email_verified_at)
-                                    <span class="text-xs font-semibold text-green-600">✓ Verificado</span>
-                                @else
-                                    <span class="text-xs font-semibold text-amber-600">Sin verificar</span>
-                                @endif
-                            </td>
-
                             <td class="px-4 py-3 text-gray-500">
                                 {{ $user->created_at?->copy()->timezone('America/Bogota')->format('d/m/Y') }}
                             </td>
@@ -85,7 +72,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">No se encontraron usuarios.</td>
+                            <td colspan="5" class="px-4 py-6 text-center text-gray-500">No se encontraron usuarios.</td>
                         </tr>
                     @endforelse
                 </tbody>

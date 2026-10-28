@@ -21,14 +21,6 @@
             </div>
         </div>
 
-        @if ($unverifiedCount > 0)
-            <a href="{{ route('admin.students.index') }}" wire:navigate
-               class="block p-4 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-800 hover:bg-amber-100">
-                {{ $unverifiedCount }} {{ $unverifiedCount === 1 ? 'usuario tiene' : 'usuarios tienen' }} el correo sin verificar.
-                Puedes marcarlos como verificados desde su ficha.
-            </a>
-        @endif
-
         <div class="grid gap-4 sm:grid-cols-2">
             <a href="{{ route('admin.subjects.index') }}" wire:navigate
                class="p-6 bg-white rounded-lg shadow hover:shadow-md transition">

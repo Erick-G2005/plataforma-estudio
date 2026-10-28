@@ -19,7 +19,6 @@ class Dashboard extends Component
             'topicsCount' => Topic::count(),
             'studentsCount' => User::where('role', 'student')->count(),
             'enrollmentsCount' => DB::table('enrollments')->count(),
-            'unverifiedCount' => User::whereNull('email_verified_at')->count(),
         ]);
     }
 }
